@@ -110,13 +110,16 @@ python3.11 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install PyTorch first
-```bash
-pip install torch==2.1.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cpu
-```
+### Install in this exact order
 
-### 4. Install remaining dependencies
 ```bash
+pip install torch==2.4.0 torchaudio==2.4.0 --index-url https://download.pytorch.org/whl/cpu
+pip install huggingface_hub==0.26.0
+pip install tokenizers==0.20.0
+pip install transformers==4.48.0
+pip install sentence-transformers==3.0.0
+pip install pyannote.audio==3.3.2
+pip install mlx-lm==0.23.0
 pip install -r requirements.txt
 ```
 
