@@ -100,7 +100,7 @@ You need four API keys before running the system. All are free tier.
 
 ### 1. Clone the repository
 ```bash
-git clone [<repo-url>](https://github.com/nc-2074/clinical-ir)
+git clone https://github.com/nc-2074/clinical-ir
 cd clinical-ir
 ```
 
