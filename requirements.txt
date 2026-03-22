@@ -1,0 +1,24 @@
+# Speaker Diarization
+pyannote.audio==3.3.2
+torch==2.1.0
+torchaudio==2.1.0
+
+# Transcription
+groq
+
+# Embeddings and Retrieval
+sentence-transformers
+supabase
+
+# LLM Analysis
+mlx-lm
+
+# API and Frontend
+flask
+flask-cors
+werkzeug
+requests
+
+# Utilities
+python-dotenv
+huggingface_hub
