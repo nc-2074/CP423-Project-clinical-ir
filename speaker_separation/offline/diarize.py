@@ -25,30 +25,22 @@ load_dotenv()
 NUM_SPEAKERS = 2
 
 
-def load_diarization_pipeline() -> Pipeline:
-    """
-    Download (first run) and load the Pyannote speaker diarization model.
+from huggingface_hub import login
 
-    BEFORE THIS WORKS you must:
-    1. Create a free Hugging Face account
-    2. Go to https://huggingface.co/pyannote/speaker-diarization-3.1
-       and click "Agree and access repository"
-    3. Go to https://huggingface.co/pyannote/segmentation-3.0
-       and click "Agree and access repository"
-    4. Put your HF_TOKEN in the .env file
-    """
+def load_diarization_pipeline() -> Pipeline:
     hf_token = os.getenv("HF_TOKEN")
     if not hf_token:
         raise EnvironmentError(
-            "HF_TOKEN is missing from your .env file. "
-            "See .env.example for instructions."
+            "HF_TOKEN is missing from your .env file."
         )
 
     print("Loading Pyannote diarization model (downloads on first run ~300MB)...")
     
+    # Login to HuggingFace first
+    login(token=hf_token)
+    
     pipeline = Pipeline.from_pretrained(
-    "pyannote/speaker-diarization-3.1",
-    token=hf_token,
+        "pyannote/speaker-diarization-3.1",
     )
 
     print("Model loaded.")
@@ -86,7 +78,7 @@ def diarize_audio(audio_path: str, pipeline: Pipeline = None) -> list[dict]:
     diarization = pipeline(str(audio_path), num_speakers=NUM_SPEAKERS)
 
     segments = []
-    for turn, _, speaker in diarization.speaker_diarization.itertracks(yield_label=True):
+    for turn, _, speaker in diarization.itertracks(yield_label=True):
         segments.append({
             "speaker": speaker,
             "start":   round(turn.start, 3),
@@ -110,3 +102,4 @@ if __name__ == "__main__":
 
     result = diarize_audio(sys.argv[1])
     print(json.dumps(result, indent=2))
+
