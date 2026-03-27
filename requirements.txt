@@ -7,7 +7,7 @@ mlx-lm>=0.22.0,<1.0.0
 livekit==1.1.2
 livekit-api==1.1.0
 livekit-agents[silero]>=0.12.0,<1.0.0
-livekit-plugins-groq>=0.3.0,<1.0.0
+livekit-plugins-groq==1.5.1 
 livekit-plugins-silero>=0.7.0,<1.0.0
 
 # ── IR / embeddings ────────────────────────────────────────────────────
