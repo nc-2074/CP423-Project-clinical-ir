@@ -1,26 +1,30 @@
-# Speaker Diarization
-pyannote.audio==3.3.2
-torch==2.4.0
-torchaudio==2.4.0
+# ── Core pipeline ──────────────────────────────────────────────────────
+pyannote.audio==4.0.4
+groq==1.0.0
+mlx-lm>=0.22.0
 
-# Transcription
-groq
+# ── LiveKit (real-time live mode) ──────────────────────────────────────
+livekit==1.1.2
+livekit-api==1.1.0
+livekit-agents[silero]>=0.12.0
+livekit-plugins-groq>=0.3.0
+livekit-plugins-silero>=0.7.0
 
-# Embeddings and Retrieval
-sentence-transformers==3.0.0
-supabase
+# ── IR / embeddings ────────────────────────────────────────────────────
+sentence-transformers>=2.7.0
+supabase==2.28.0
 
-# LLM Analysis
-mlx-lm==0.23.0
+# ── Web / API ──────────────────────────────────────────────────────────
+flask==3.0.0
+flask-cors==4.0.0
+requests==2.32.5
 
-# API and Frontend
-flask
-flask-cors
-werkzeug
-requests
-
-# Utilities
-python-dotenv
+# ── Utilities ──────────────────────────────────────────────────────────
+numpy==2.4.2
+pandas==3.0.1
+scikit-learn==1.8.0
+python-dotenv==1.0.0
+pydub==0.25.1
 huggingface_hub==0.26.0
 numpy<2
 accelerate
