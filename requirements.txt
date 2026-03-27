@@ -20,7 +20,6 @@ flask-cors==4.0.0
 requests==2.32.5
 
 # ── Utilities ──────────────────────────────────────────────────────────
-numpy==2.4.2
 pandas==3.0.1
 scikit-learn==1.8.0
 python-dotenv==1.0.0
