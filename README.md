@@ -26,7 +26,7 @@ User uploads audio → Flask API → Pyannote diarization → Whisper transcript
 ## Folder Structure
 
 ```
-clinical-ir/
+CP423-clinical-ir/
 ├── audio/                          ← interview audio files
 ├── speaker_separation/
 │   ├── offline/
