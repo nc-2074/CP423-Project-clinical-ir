@@ -1,8 +1,7 @@
 #!/bin/bash
 # install.sh
 # ----------
-# Install all dependencies in the correct order to avoid pip's
-# dependency resolver hitting its depth limit.
+# Install all dependencies in the correct order
 
 set -e  # stop on first error
 
@@ -13,8 +12,8 @@ echo "========================================================"
 echo ""
 
 # ── Step 1: Core ML / audio ───────────────────────────────────────────
-echo "[1/6] Installing PyTorch (required by pyannote)..."
-pip install torch torchaudio --index-url https://download.pytorch.org/whl/cpu
+echo "[1/6] Installing PyTorch (Apple Silicon with Metal support)..."
+pip install torch torchaudio
 
 echo ""
 echo "[2/6] Installing pyannote and Groq..."
@@ -26,8 +25,6 @@ echo "[3/6] Installing MLX for MedGemma..."
 pip install "mlx-lm>=0.22.0"
 
 # ── Step 3: LiveKit — install compatible versions ────────────────────
-# Note: livekit-plugins-groq 1.x requires livekit-agents 1.x
-# Using latest stable versions for compatibility
 echo ""
 echo "[4/6] Installing LiveKit core..."
 pip install "livekit>=1.0.0" "livekit-api>=1.0.0"
@@ -43,7 +40,7 @@ echo ""
 echo "[6/6] Installing remaining dependencies..."
 pip install \
     "sentence-transformers>=2.7.0" \
-    "supabase>=2.0.0" \
+    "supabase>=2.28.0" \
     "flask>=3.0.0" \
     "flask-cors>=4.0.0" \
     "requests>=2.31.0" \
