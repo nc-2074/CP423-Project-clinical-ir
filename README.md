@@ -121,7 +121,7 @@ You need seven credentials before running the system. All services have a free t
 ### 1. Clone the repository
 
 ```bash
-git clone <repo-url>
+git clone https://github.com/nc-2074/clinical-ir
 cd clinical-ir
 ```
 
