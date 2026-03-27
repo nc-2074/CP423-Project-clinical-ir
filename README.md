@@ -132,19 +132,14 @@ python3.11 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install PyTorch first (must be done before other dependencies)
+### 3. Install dependencies
 
 ```bash
-pip install torch==2.1.0 torchaudio==2.1.0 --index-url https://download.pytorch.org/whl/cpu
+chmod +x install.sh
+./install.sh
 ```
 
-### 4. Install remaining dependencies
-
-```bash
-pip install -r requirements.txt
-```
-
-### 5. Configure your `.env` file
+### 4. Configure your `.env` file
 
 ```bash
 cp .env.example .env
@@ -169,7 +164,7 @@ LIVEKIT_API_KEY=your_livekit_api_key_here
 LIVEKIT_API_SECRET=your_livekit_api_secret_here
 ```
 
-### 6. Set up the Supabase database
+### 5. Set up the Supabase database
 
 Go to your Supabase project → **SQL Editor** and run the following queries one at a time.
 
@@ -266,7 +261,7 @@ LANGUAGE SQL STABLE AS $$
 $$;
 ```
 
-### 7. Set up n8n (automation workflow)
+### 6. Set up n8n (automation workflow)
 
 Start n8n using Docker:
 
