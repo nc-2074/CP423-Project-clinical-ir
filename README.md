@@ -341,7 +341,7 @@ Go to [http://localhost:5001](http://localhost:5001) in your browser.
 ## Offline Mode (Pre-recorded Interview)
 
 1. Click **Offline Mode** in the frontend
-2. Upload a `.wav`, `.mp3`, or `.m4a` audio file (drag and drop or browse)
+2. Upload a `.wav`, `.mp3`, or `.m4a` audio file
 3. Click **Process Interview**
 4. Wait for the pipeline to complete — this typically takes 2–3 minutes
 5. View results across three tabs:
