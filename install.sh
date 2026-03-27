@@ -47,7 +47,7 @@ pip install \
     "flask>=3.0.0" \
     "flask-cors>=4.0.0" \
     "requests>=2.31.0" \
-    "numpy>=1.24.0,<2.0.0" \
+    "numpy>=2.0,<3.0" \
     "pandas>=2.0.0" \
     "scikit-learn>=1.3.0" \
     "python-dotenv>=1.0.0" \
