@@ -411,7 +411,7 @@ In a second terminal:
 ```bash
 cd /Users/name/CP423-clinical-ir
 source venv/bin/activate
-python speaker_separation/live/transcriber.py
+python speaker_separation/live/transcriber.py start
 ```
 
 You should see:
