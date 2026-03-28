@@ -132,19 +132,43 @@ python3.11 -m venv venv
 source venv/bin/activate
 ```
 
-### 3. Install dependencies
+### 3. Install dependencies with working versions
 
 ```bash
-chmod +x install.sh
-./install.sh
-```
+# Core ML packages
+pip install torch==2.4.0 torchaudio==2.4.0
+pip install numpy==1.24.3
 
+# Hugging Face ecosystem
+pip install huggingface_hub==0.26.0
+pip install tokenizers==0.20.0
+pip install transformers==4.48.0
+pip install sentence-transformers==3.0.0
+
+# Pyannote for diarization
+pip install pyannote.audio==3.3.2
+
+# MLX for Apple Silicon
+pip install mlx-lm==0.23.0
+
+# Groq API
+pip install groq==1.0.0
+
+# LiveKit for real-time transcription
+pip install livekit livekit-api livekit-agents livekit-plugins-silero livekit-plugins-groq
+
+# Other utilities
+pip install matplotlib python-dotenv pydub soundfile
+pip install supabase==2.28.0
+pip install flask==3.0.0 flask-cors==4.0.0 requests==2.31.0
+pip install pandas scikit-learn
+```
 ### 4. Configure your `.env` file
 
 ```bash
-cp .env.example .env
+cp env.example .env
+nano .env
 ```
-
 Open `.env` and fill in your keys:
 
 ```env
@@ -373,13 +397,21 @@ source venv/bin/activate
 python app.py
 ```
 
-### Step 2: Start the LiveKit transcriber agent
+### Step 2: Create audio directory
+
+```bash
+mkdir -p audio
+chmod 755 audio
+```
+
+### Step 3: Start the LiveKit transcriber agent
 
 In a second terminal:
 
 ```bash
+cd /Users/name/CP423-clinical-ir
 source venv/bin/activate
-python -m speaker_separation.live.transcriber
+python speaker_separation/live/transcriber.py
 ```
 
 You should see:
