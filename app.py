@@ -40,6 +40,21 @@ from ir.analyze import (
     get_medgemma,
 )
 from sentence_transformers import SentenceTransformer
+
+try:
+    from speaker_separation.live.transcriber import get_session_transcript, get_session_file
+    print("✓ Live transcriber loaded successfully")
+except Exception as e:
+    print(f"⚠️ Live transcriber not available: {e}")
+    get_session_transcript = None
+    get_session_file = None
+
+try:
+    from livekit import api as livekit_api
+    print("✓ LiveKit API loaded successfully")
+except Exception as e:
+    print(f"⚠️ LiveKit API not available: {e}")
+    livekit_api = None
  
 app = Flask(__name__)
 CORS(app)
@@ -261,7 +276,9 @@ def live_tokens():
             "clinician_token": "eyJ..."
         }
     """
-    from livekit import api as livekit_api
+    # livekit_api is already imported at the top
+    if livekit_api is None:
+        return jsonify({"error": "LiveKit API not available. Check installation."}), 500
  
     livekit_url    = os.getenv("LIVEKIT_URL")
     livekit_key    = os.getenv("LIVEKIT_API_KEY")
@@ -321,62 +338,77 @@ def live_transcript():
     Query params:
         room_name: the LiveKit room name
     """
-    from speaker_separation.live.transcriber import get_session_transcript, get_session_file
- 
     room_name = request.args.get("room_name")
     if not room_name:
         return jsonify({"error": "room_name is required"}), 400
- 
-    # Try in-memory first, then fall back to file
-    segments = get_session_transcript(room_name)
- 
-    if not segments:
-        file_path = get_session_file(room_name)
-        if file_path and Path(file_path).exists():
-            segments = json.loads(Path(file_path).read_text())
- 
+
+    # Try to read from the JSON file first (where the transcriber saves it)
+    transcript_file = f"audio/{room_name}_live_transcript.json"
+    segments = []
+    
+    if Path(transcript_file).exists():
+        try:
+            with open(transcript_file, 'r', encoding='utf-8') as f:
+                segments = json.load(f)
+            print(f"✓ Read {len(segments)} segments from {transcript_file}")
+        except Exception as e:
+            print(f"⚠️ Error reading transcript file: {e}")
+    
+    # Fall back to in-memory if file doesn't exist (for backward compatibility)
+    if not segments and get_session_transcript:
+        segments = get_session_transcript(room_name) or []
+    
     return jsonify({"segments": segments, "room_name": room_name})
  
  
 # ── Stop live session → index + analyze ────────────────────────────────
+
 @app.route("/live/stop", methods=["POST"])
 def live_stop():
     """
     Called when the clinician ends the live interview.
     Reads the transcript collected by the LiveKit agent,
-    indexes it into Supabase, and runs full MedGemma analysis —
-    identical to the offline pipeline's final steps.
- 
-    Request body:
-        { "room_name": "interview-1234567890" }
- 
-    Response:
-        Same shape as /analyze + transcript + session_id
+    indexes it into Supabase, and runs full MedGemma analysis.
     """
     import uuid
-    from speaker_separation.live.transcriber import get_session_transcript, get_session_file
- 
-    data      = request.json or {}
+    
+    data = request.json or {}
     room_name = data.get("room_name")
  
     if not room_name:
         return jsonify({"error": "room_name is required"}), 400
- 
-    # Get transcript — prefer in-memory, fall back to file
-    segments = get_session_transcript(room_name)
- 
-    if not segments:
+
+    # Try to read from the JSON file first
+    transcript_file = f"audio/{room_name}_live_transcript.json"
+    segments = []
+    
+    if Path(transcript_file).exists():
+        try:
+            with open(transcript_file, 'r', encoding='utf-8') as f:
+                segments = json.load(f)
+            print(f"✓ Read {len(segments)} segments from {transcript_file}")
+        except Exception as e:
+            print(f"⚠️ Error reading transcript file: {e}")
+    
+    # Fall back to in-memory if file doesn't exist
+    if not segments and get_session_transcript:
+        segments = get_session_transcript(room_name) or []
+    
+    if not segments and get_session_file:
         file_path = get_session_file(room_name)
         if file_path and Path(file_path).exists():
-            segments = json.loads(Path(file_path).read_text())
+            try:
+                with open(file_path, 'r', encoding='utf-8') as f:
+                    segments = json.load(f)
+            except Exception as e:
+                print(f"⚠️ Error reading fallback file: {e}")
  
     if not segments:
         return jsonify({"error": "No transcript found for this room. "
                                  "Is the LiveKit agent running?"}), 404
  
-    # Save final transcript file
-    transcript_path = f"audio/{room_name}_live_transcript.json"
-    Path(transcript_path).write_text(json.dumps(segments, indent=2))
+    # Save final transcript file if it doesn't exist already
+    Path(transcript_file).write_text(json.dumps(segments, indent=2), encoding='utf-8')
  
     # Index into Supabase
     session_id = str(uuid.uuid4())
@@ -388,32 +420,32 @@ def live_stop():
         session_id=session_id,
     )
  
-    # Run full MedGemma analysis (same as offline)
+    # Run full MedGemma analysis
     print("Running MedGemma analysis on live transcript...")
     get_medgemma()
     emb_model = SentenceTransformer("all-MiniLM-L6-v2")
  
-    summary  = summarize_interview(segments)
-    qa       = answer_symptom_question(
-                   "What symptoms does the patient have and how long have they had them?",
-                   all_segments=segments, embedding_model=emb_model)
-    quality  = analyze_interview_quality(segments)
+    summary = summarize_interview(segments)
+    qa = answer_symptom_question(
+        "What symptoms does the patient have and how long have they had them?",
+        all_segments=segments, embedding_model=emb_model)
+    quality = analyze_interview_quality(segments)
     referral = recommend_referral(segments)
     followup = recommend_followup_questions(segments)
  
     return jsonify({
-        "transcript":      segments,
-        "session_id":      session_id,
-        "transcript_path": transcript_path,
-        "summary":         summary,
-        "symptom_qa":      qa,
-        "quality":         quality,
-        "referral":        referral,
-        "followup":        followup,
+        "transcript": segments,
+        "session_id": session_id,
+        "transcript_path": transcript_file,
+        "summary": summary,
+        "symptom_qa": qa,
+        "quality": quality,
+        "referral": referral,
+        "followup": followup,
     })
  
  
 # ── Run ─────────────────────────────────────────────────────────────────
 if __name__ == "__main__":
     app.run(host="0.0.0.0", port=5001, debug=False)
- 
+
