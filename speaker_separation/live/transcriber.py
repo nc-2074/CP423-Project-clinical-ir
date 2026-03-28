@@ -41,6 +41,8 @@ from livekit.agents import (
 )
 from livekit.plugins import groq as livekit_groq
 from livekit.plugins.silero import VAD
+
+Path("audio").mkdir(exist_ok=True)
  
 load_dotenv()
  
