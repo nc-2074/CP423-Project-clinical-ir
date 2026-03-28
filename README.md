@@ -58,7 +58,10 @@ CP423-clinical-ir/
 │   ├── test_pyannote.py            ← verify Pyannote model loads
 │   ├── test_setup.py               ← full environment check
 │   └── test_supabase.py            ← verify Supabase connection
-├── app.py                          ← Flask API
+├── workflow/
+│   └── n8n-workflow-import.json    ← n8n workflow to import        
+├── app.py                          ← Flask API — offline mode (port 5001)
+├── server.py                       ← Flask API — live mode (port 5000)
 ├── .env                            ← API keys (never commit this)
 ├── .env.example                    ← template for API keys
 └── README.md
@@ -382,23 +385,49 @@ python -m speaker_separation.offline.pipeline audio/interview.wav --patient SPEA
 # Save output to a custom path
 python -m speaker_separation.offline.pipeline audio/interview.wav --output results/transcript.json
 ```
+### Run MedGemma analysis manually
+
+```bash
+python -m ir.analyze path/to/transcript.json
+```
+
+### Run retrieval evaluation (Precision@K and Recall@K)
+
+```bash
+python -m ir.evaluate
+```
+
+Results are printed to the terminal and saved to `evaluation_results.json`.
+
+### Index a transcript manually
+
+```bash
+python -m ir.index path/to/transcript.json
+```
 
 ---
 
 ## Live Mode (Real-time Interview)
 
-Live mode requires the LiveKit transcriber agent running separately alongside the Flask API.
+Requires three terminals running simultaneously.
 
-### Step 1: Start the Flask API
+### Terminal 1 — offline pipeline API
 
 ```bash
-source venv/bin/activate
 python app.py
 ```
 
-### Step 2: Start the LiveKit transcriber agent
+#### Terminal 2 — live mode API
 
 In a second terminal:
+
+```bash
+cd /Users/name/CP423-Project-clinical-ir
+source venv/bin/activate
+python server.py
+```
+
+#### Terminal 3 — LiveKit transcriber agent
 
 ```bash
 cd /Users/name/CP423-Project-clinical-ir
@@ -431,15 +460,6 @@ Models ready.
 
 Click **End Interview & Analyze** in the frontend. This stops transcription, indexes the transcript into Supabase, and runs full MedGemma analysis.
 
-### Generate tokens from the command line (for testing)
-
-```bash
-python scripts/generate_tokens.py
-
-# With a custom room name
-python scripts/generate_tokens.py --room my-custom-room
-```
-
 ---
 
 ## Individual Module Usage
@@ -456,27 +476,6 @@ python -m ir.retrieve "what symptoms does the patient have?" patient
 # Search clinician segments only, top 3 results
 python -m ir.retrieve "what medications were prescribed?" clinician 3
 ```
-
-### Run MedGemma analysis manually
-
-```bash
-python -m ir.analyze path/to/transcript.json
-```
-
-### Run retrieval evaluation (Precision@K and Recall@K)
-
-```bash
-python -m ir.evaluate
-```
-
-Results are printed to the terminal and saved to `evaluation_results.json`.
-
-### Index a transcript manually
-
-```bash
-python -m ir.index path/to/transcript.json
-```
-
 ---
 
 ## API Endpoints
