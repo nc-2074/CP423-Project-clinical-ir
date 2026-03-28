@@ -397,19 +397,12 @@ source venv/bin/activate
 python app.py
 ```
 
-### Step 2: Create audio directory
-
-```bash
-mkdir -p audio
-chmod 755 audio
-```
-
-### Step 3: Start the LiveKit transcriber agent
+### Step 2: Start the LiveKit transcriber agent
 
 In a second terminal:
 
 ```bash
-cd /Users/name/CP423-clinical-ir
+cd /Users/name/CP423-Project-clinical-ir
 source venv/bin/activate
 python speaker_separation/live/transcriber.py start
 ```
