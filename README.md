@@ -61,7 +61,6 @@ CP423-clinical-ir/
 ├── app.py                          ← Flask API
 ├── .env                            ← API keys (never commit this)
 ├── .env.example                    ← template for API keys
-├── requirements.txt                ← Python dependencies
 └── README.md
 ```
 
