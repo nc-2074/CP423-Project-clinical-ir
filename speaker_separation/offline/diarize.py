@@ -103,3 +103,4 @@ if __name__ == "__main__":
     result = diarize_audio(sys.argv[1])
     print(json.dumps(result, indent=2))
 
+
